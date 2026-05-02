@@ -1,0 +1,401 @@
+<html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How to Download on CurseForge — MIA Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --grass:#5D9E31; --darkgrass:#3A5F1E; --deepsky:#3A8FC7;
+  --dark:#080E1A; --panel:#141E2E; --card:#1A2435;
+  --light:#F0EBD8; --accent:#FFD700; --warn:#FF6B35;
+  --tip:#47C96B; --sand:#F5D67A; --mia:#5D9E31;
+  --bedrock:#47C96B; --java:#C678FF;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+
+body {
+  background:var(--dark);
+  font-family:'Nunito',sans-serif;
+  color:var(--light);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+#bg-canvas { position:fixed; top:0;left:0; width:100%;height:100%; z-index:0; pointer-events:none; }
+
+.ground { position:fixed; bottom:0;left:0;right:0;z-index:1;pointer-events:none; }
+.ground-grass {
+  height:20px;
+  background:repeating-linear-gradient(90deg,
+    #5D9E31 0,#5D9E31 15px,#4A8525 15px,#4A8525 30px,
+    #6BAF38 30px,#6BAF38 45px,#4A8525 45px,#4A8525 60px);
+  border-top:3px solid #8FD44A;
+}
+.ground-dirt {
+  height:14px;
+  background:repeating-linear-gradient(90deg,
+    #8B6340 0,#8B6340 15px,#7A5530 15px,#7A5530 30px,
+    #9A7050 30px,#9A7050 45px,#7A5530 45px,#7A5530 60px);
+}
+
+.site-wrap { position:relative; z-index:2; }
+
+/* ── TOP BAR ── */
+.top-bar {
+  background:rgba(8,14,26,0.88); backdrop-filter:blur(14px);
+  border-bottom:2px solid rgba(93,158,49,0.4);
+  padding:8px 20px; display:flex; align-items:center;
+  justify-content:space-between; gap:14px; flex-wrap:wrap;
+  position:sticky; top:0; z-index:100;
+  box-shadow:0 2px 24px rgba(93,158,49,0.12);
+}
+.top-bar-left{display:flex;align-items:center;gap:10px;}
+.top-bar-logo { width:36px; height:36px; border-radius:8px; object-fit:cover; border:2px solid rgba(93,158,49,0.5); box-shadow:0 0 12px rgba(93,158,49,0.4); }
+.top-bar-name { font-family:'Press Start 2P',monospace; font-size:7px; color:var(--accent); letter-spacing:1.5px; line-height:1.7; text-shadow:0 0 10px rgba(255,215,0,0.4); display:block; }
+.top-bar-tagline{font-size:10px;color:#6A9A6A;letter-spacing:0.5px;}
+.top-bar-join {
+  display:inline-flex; align-items:center; gap:6px;
+  background:linear-gradient(135deg,#5865F2,#4752C4);
+  color:#fff; font-family:'Press Start 2P',monospace;
+  font-size:7px; padding:7px 14px; border-radius:6px;
+  text-decoration:none; letter-spacing:0.5px;
+  border:1.5px solid rgba(140,150,255,0.4);
+  transition:transform .2s,box-shadow .2s;
+  box-shadow:0 2px 10px rgba(88,101,242,0.35); white-space:nowrap;
+}
+.top-bar-join:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 4px 16px rgba(88,101,242,0.5);}
+.top-bar-join svg{width:14px;height:14px;flex-shrink:0;fill:#fff;}
+
+/* ── HERO ── */
+.hero {
+  background:linear-gradient(180deg,#87CEEB 0%,#5BADD4 36%,#5D9E31 36%,#4A7E26 52%,#8B6340 52%,#6B4C2A 100%);
+  padding:32px 20px 20px; text-align:center; border-bottom:6px solid var(--darkgrass); position:relative;overflow:hidden;
+}
+.hero-clouds{position:absolute;top:0;left:0;right:0;bottom:50%;pointer-events:none;}
+.hcloud{ position:absolute;background:rgba(255,255,255,0.86);border-radius:3px; animation:cloudDrift linear infinite;}
+.hcloud::before{ content:'';position:absolute;background:rgba(255,255,255,0.86);border-radius:3px;width:55%;height:120%;top:-60%;left:14%;box-shadow:26px 0 0 rgba(255,255,255,0.86);}
+@keyframes cloudDrift{from{transform:translateX(-150px)}to{transform:translateX(110vw)}}
+.hero h1 { font-family:'Press Start 2P',monospace; font-size:clamp(13px,3.2vw,22px); color:#fff;text-shadow:3px 3px 0 #000; line-height:1.6; position:relative;z-index:1; }
+.hero .badge { display:inline-block;background:rgba(0,0,0,0.55); border:2px solid var(--accent);padding:4px 16px; font-family:'Press Start 2P',monospace;font-size:7px; color:var(--accent);letter-spacing:2px;margin-bottom:10px; position:relative;z-index:1;box-shadow:0 0 18px rgba(255,215,0,0.15); }
+.hero-sub{ font-size:13px; color:var(--sand); font-weight:700; margin-top:4px; position:relative; z-index:1; }
+
+/* ── WRAP ── */
+.wizard-wrap{ max-width:780px; margin: 20px auto 40px; padding: 0 18px; z-index:2; position:relative; }
+
+/* ── CHOICE SCREEN ── */
+.choice-screen{ text-align:center; margin:36px 0 16px; transition: all 0.4s ease; }
+.choice-screen.hidden{ display:none; }
+.choice-title{ font-family:'Press Start 2P',monospace;font-size:9px; color:var(--accent);margin-bottom:24px;letter-spacing:2px; text-shadow:0 0 20px rgba(255,215,0,0.4); }
+.choice-buttons{display:flex;justify-content:center;gap:20px;flex-wrap:wrap;}
+.choice-btn {
+  background:var(--card); border-radius:16px; padding:24px 18px;
+  min-width:220px; max-width:260px; cursor:pointer;
+  transition:all 0.28s; text-align:center; color:#fff;
+  font-family:'Nunito',sans-serif; position:relative; overflow:hidden;
+  border:2px solid rgba(255,255,255,0.12);
+  user-select:none;
+}
+.choice-btn:hover{transform:translateY(-6px);}
+.bedrock-btn { border-color: rgba(71,201,107,0.5); box-shadow:0 6px 30px rgba(71,201,107,0.1); }
+.bedrock-btn:hover{ border-color:rgba(71,201,107,0.8); box-shadow:0 14px 50px rgba(71,201,107,0.25); }
+.java-btn { border-color: rgba(198,120,255,0.5); box-shadow:0 6px 30px rgba(198,120,255,0.1); }
+.java-btn:hover{ border-color:rgba(198,120,255,0.8); box-shadow:0 14px 50px rgba(198,120,255,0.25); }
+.choice-icon{font-size:42px;margin-bottom:10px;}
+.choice-btn h2{font-size:18px;font-weight:900;margin-bottom:6px;}
+.choice-desc{font-size:11px;color:rgba(255,255,255,0.65);line-height:1.4;}
+
+/* ── STEP PANELS ── */
+.step-container {
+  background:rgba(20,30,46,0.85); backdrop-filter:blur(12px);
+  border-radius:14px; padding:22px 20px; min-height:280px;
+  box-shadow:0 6px 32px rgba(0,0,0,0.4),0 0 30px rgba(93,158,49,0.12);
+  border:1px solid rgba(93,158,49,0.2); transition:all 0.4s;
+}
+.step-panel { display:none; padding-left:16px; border-left:3px solid transparent; transition:border-color 0.3s; }
+.step-panel.active { display:block; animation:fadeSlide 0.3s ease; }
+@keyframes fadeSlide { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+.step-title { font-size:18px; font-weight:900; color:#fff; margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+.step-num { font-family:'Press Start 2P',monospace; font-size:7px; padding:3px 10px; border-radius:4px; color:#fff; letter-spacing:1px; box-shadow:0 0 12px rgba(93,158,49,0.6); }
+.step-body { font-size:14px; line-height:1.7; color:#C8D8E0; }
+.step-body strong { color:var(--accent); }
+
+.callout { display:flex; gap:8px; align-items:flex-start; border-radius:6px; padding:8px 12px; margin-top:10px; font-size:12.5px; line-height:1.6; backdrop-filter:blur(4px); }
+.callout.tip { background:rgba(71,201,107,0.08); border:1px solid #47C96B; color:#A8F0BC; }
+.callout.warn { background:rgba(255,107,53,0.08); border:1px solid #FF6B35; color:#FFB898; }
+.callout.info { background:rgba(58,143,199,0.08); border:1px solid #3A8FC7; color:#A8D8F8; }
+.callout-icon { font-size:16px; flex-shrink:0; margin-top:1px; }
+
+.callout.mia-callout {
+  background:linear-gradient(135deg,rgba(155,79,219,0.1),rgba(255,105,180,0.08));
+  border:1px solid rgba(198,120,255,0.4); color:#F0C8F0; margin-top:14px;
+  box-shadow:0 0 14px rgba(198,120,255,0.12); padding:10px 14px; font-size:13px; line-height:1.65;
+}
+.callout.mia-callout .callout-icon img { width:18px;height:18px;border-radius:3px;vertical-align:middle; }
+
+/* ── EXTRA BUTTON ── */
+#stepExtraBtn { display:none; text-align:center; margin:14px 0 0; }
+#stepExtraBtn a {
+  display:inline-block; background:linear-gradient(135deg,#FFD700,#FFA500);
+  color:#000; font-weight:900; font-size:14px; padding:11px 26px; border-radius:12px;
+  text-decoration:none; border:2px solid #FF8C00; box-shadow:0 0 22px rgba(255,215,0,0.5); transition:transform 0.2s,box-shadow 0.2s;
+}
+#stepExtraBtn a:hover{ transform:translateY(-3px); box-shadow:0 0 32px rgba(255,215,0,0.85); }
+
+/* ── NAVIGATION ── */
+.progress-bar { width:100%; height:4px; background:rgba(255,255,255,0.07); border-radius:3px; margin-bottom:6px; }
+.progress-fill { height:100%; background:linear-gradient(90deg,var(--grass),var(--accent)); border-radius:3px; transition:width 0.3s; box-shadow:0 0 8px rgba(93,158,49,0.5); }
+.nav-row { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:14px; flex-wrap:wrap; }
+.nav-btn {
+  background:rgba(36,48,64,0.8); backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,0.12); color:#fff;
+  font-size:13px; font-weight:700; padding:9px 18px; border-radius:8px;
+  cursor:pointer; transition:0.2s; display:flex; align-items:center; gap:5px;
+  box-shadow:0 3px 10px rgba(0,0,0,0.3); font-family:'Nunito',sans-serif;
+}
+.nav-btn:hover:not(:disabled){background:rgba(71,201,107,0.18);border-color:var(--tip);box-shadow:0 0 16px rgba(71,201,107,0.25);}
+.nav-btn:disabled{opacity:0.3;cursor:not-allowed;}
+.step-indicator { font-family:'Press Start 2P',monospace; font-size:7px; color:var(--accent); letter-spacing:1px; text-align:center; text-shadow:0 0 10px rgba(255,215,0,0.35); }
+.back-to-choice { margin-bottom:14px;display:inline-block;background:none;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.7);padding:5px 12px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:700;transition:0.2s;user-select:none; }
+.back-to-choice:hover { background:rgba(255,255,255,0.07);color:#fff; }
+
+/* ── FOOTER ── */
+.footer { text-align:center;margin-top:24px;padding:0 18px 30px; }
+.footer-inner { background:rgba(0,0,0,0.72);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px 22px;display:inline-block;min-width:260px;box-shadow:0 8px 20px rgba(0,0,0,0.5); }
+.footer-logo { font-family:'Press Start 2P',monospace;font-size:8px;color:var(--mia);letter-spacing:2px;margin-bottom:6px;text-shadow:0 0 12px rgba(93,158,49,0.5); }
+.footer-sub { font-size:10px;color:#7A8A9A;letter-spacing:1px; }
+.footer-sub span { color:#FF6B6B; }
+
+@media (max-width:600px){ .top-bar{padding:8px 12px;gap:8px;} .top-bar-join{font-size:6px;padding:5px 10px;} .choice-btn{padding:18px 14px;min-width:150px;} .choice-icon{font-size:34px;} .choice-btn h2{font-size:16px;} }
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<div class="ground"><div class="ground-grass"></div><div class="ground-dirt"></div></div>
+
+<div class="site-wrap">
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="top-bar-left">
+    <img src="mia-icon.png" alt="MIA" class="top-bar-logo">
+    <div>
+      <span class="top-bar-name">Minecraft Items Accelerated [MIA]</span>
+      <span class="top-bar-tagline">Guides that keep you safe</span>
+    </div>
+  </div>
+  <a href="https://discord.gg/tS5WmGEyxN" class="top-bar-join" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24" fill="none" preserveAspectRatio="xMidYMid meet">
+      <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.292a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.1.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" fill="#fff"/>
+    </svg>
+    Join Now!
+  </a>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-clouds">
+    <div class="hcloud" style="width:72px;height:18px;top:16px;left:6%;animation-duration:34s;animation-delay:-4s;"></div>
+    <div class="hcloud" style="width:52px;height:14px;top:10px;left:30%;animation-duration:26s;animation-delay:-14s;"></div>
+    <div class="hcloud" style="width:85px;height:20px;top:22px;left:55%;animation-duration:40s;animation-delay:-8s;"></div>
+    <div class="hcloud" style="width:58px;height:15px;top:8px;left:78%;animation-duration:30s;animation-delay:-20s;"></div>
+  </div>
+  <div class="badge">📦 MIA GUIDE</div>
+  <h1>HOW TO DOWNLOAD<br>FROM CURSEFORGE</h1>
+  <p class="hero-sub">Choose your edition first — avoid wrong files</p>
+</div>
+
+<!-- WIZARD -->
+<div class="wizard-wrap">
+
+  <!-- CHOICE SCREEN -->
+  <div class="choice-screen" id="choiceScreen">
+    <div class="choice-title">⬛ CHOOSE YOUR MINECRAFT EDITION ⬛</div>
+    <div class="choice-buttons">
+      <div class="choice-btn java-btn" id="btnJava">
+        <div class="choice-icon">🖥️</div>
+        <h2 style="color:#D49CFF">Java Edition</h2>
+        <div class="choice-desc">PC only · .jar files · Forge / Fabric / NeoForge</div>
+      </div>
+      <div class="choice-btn bedrock-btn" id="btnBedrock">
+        <div class="choice-icon">📱</div>
+        <h2 style="color:#6EF09A">Bedrock Edition</h2>
+        <div class="choice-desc">Mobile / Win 10‑11 / Console · .mcpack / .mcaddon</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WIZARD AREA -->
+  <div id="wizardArea" style="display:none;">
+    <button class="back-to-choice" id="backBtn">← Choose another edition</button>
+    <div class="step-container" id="stepContainer"></div>
+    <div class="progress-bar" style="margin-top:14px;"><div class="progress-fill" id="progressFill"></div></div>
+    <div id="stepExtraBtn">
+      <a href="https://xameraman.github.io/mia-install-guide-java-n-bedrock/" target="_blank">
+        🔧 Full Import Guide (Java & Bedrock) – Click Here
+      </a>
+    </div>
+    <div class="nav-row">
+      <button class="nav-btn" id="prevBtn">← Previous</button>
+      <span class="step-indicator" id="stepIndicator">1 / 8</span>
+      <button class="nav-btn" id="nextBtn">Next →</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <div class="footer-inner">
+    <div class="footer-logo">
+      <img src="mia-icon.png" alt="MIA" style="width:18px;height:18px;vertical-align:middle;border-radius:4px;margin-right:4px;">
+      MIA — MINECRAFT ITEMS ACCELERATED
+    </div>
+    <div class="footer-sub">ALWAYS CREDIT ORIGINAL PACK CREATORS <span>❤️</span></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+/* ─── Animated canvas background ─── */
+(function(){
+  const c=document.getElementById('bg-canvas');
+  const x=c.getContext('2d');
+  let W,H;
+  function R(){W=c.width=window.innerWidth;H=c.height=window.innerHeight;}
+  R();window.addEventListener('resize',R);
+  const S=[];for(let i=0;i<160;i++)S.push({x:Math.random(),y:Math.random()*.85,r:Math.random()*1.4+.3,a:Math.random(),sp:.003+Math.random()*.006,ph:Math.random()*Math.PI*2});
+  const OC=['rgba(93,158,49,','rgba(71,201,107,','rgba(198,120,255,','rgba(255,215,0,','rgba(88,101,242,'];
+  const O=[];for(let i=0;i<7;i++)O.push({x:Math.random(),y:Math.random(),r:60+Math.random()*120,co:OC[Math.floor(Math.random()*OC.length)],vx:(Math.random()-.5)*.00015,vy:(Math.random()-.5)*.00015,a:.04+Math.random()*.05});
+  const PC=['#5D9E31','#7DC940','#FFD700','#47C96B','#C678FF','#fff','#5865F2'];
+  const P=[];function sp(){return{x:Math.random(),y:1.05,s:3+Math.random()*5,co:PC[Math.floor(Math.random()*7)],vx:(Math.random()-.5)*.0004,vy:-(.0004+Math.random()*.0008),a:0,mA:.4+Math.random()*.35,ro:Math.random()*360,rv:(Math.random()-.5)*1.2};}
+  for(let i=0;i<28;i++)P.push(sp());
+  let SH=[];setInterval(()=>SH.push({x:Math.random()*.6,y:Math.random()*.4,len:80+Math.random()*140,sp:.006+Math.random()*.008,pro:0,a:.7+Math.random()*.3,ang:Math.PI/5+(Math.random()-.5)*.3}),3200);
+  let t=0;
+  function D(){
+    x.clearRect(0,0,W,H);
+    const g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'#06091A');g.addColorStop(.5,'#0A1628');g.addColorStop(1,'#0D2040');
+    x.fillStyle=g;x.fillRect(0,0,W,H);
+    for(const o of O){o.x+=o.vx;o.y+=o.vy;if(o.x<-.1)o.x=1.1;if(o.x>1.1)o.x=-.1;if(o.y<-.1)o.y=1.1;if(o.y>1.1)o.y=-.1;
+      const rg=x.createRadialGradient(o.x*W,o.y*H,0,o.x*W,o.y*H,o.r);rg.addColorStop(0,o.co+o.a+')');rg.addColorStop(1,o.co+'0)');
+      x.fillStyle=rg;x.beginPath();x.arc(o.x*W,o.y*H,o.r,0,Math.PI*2);x.fill();}
+    for(const s of S){const p=.4+.6*(.5+.5*Math.sin(t*s.sp+s.ph));x.globalAlpha=s.a*p;x.fillStyle='#fff';x.beginPath();x.arc(s.x*W,s.y*H,s.r*(.8+.3*p),0,Math.PI*2);x.fill();}x.globalAlpha=1;
+    SH=SH.filter(s=>s.pro<1.3);
+    for(const s of SH){s.pro+=s.sp;const sx=s.x*W+Math.cos(s.ang)*s.pro*s.len*3,sy=s.y*H+Math.sin(s.ang)*s.pro*s.len*3;const ex=sx-Math.cos(s.ang)*s.len,ey=sy-Math.sin(s.ang)*s.len;const f=s.pro>.8?1-(s.pro-.8)/.5:1;const lg=x.createLinearGradient(ex,ey,sx,sy);lg.addColorStop(0,'rgba(255,255,255,0)');lg.addColorStop(1,`rgba(255,255,255,${s.a*f})`);x.strokeStyle=lg;x.lineWidth=1.5;x.globalAlpha=f;x.beginPath();x.moveTo(ex,ey);x.lineTo(sx,sy);x.stroke();x.globalAlpha=1;}
+    for(let i=0;i<P.length;i++){const p=P[i];p.x+=p.vx;p.y+=p.vy;p.ro+=p.rv;p.a=Math.min(p.mA,p.a+.008);if(p.y<-.05){P[i]=sp();continue;}x.save();x.translate(p.x*W,p.y*H);x.rotate(p.ro*Math.PI/180);x.globalAlpha=p.a;x.fillStyle=p.co;x.fillRect(-p.s/2,-p.s/2,p.s,p.s);x.restore();}x.globalAlpha=1;t+=.6;requestAnimationFrame(D);}
+  D();
+})();
+
+/* ─── ENHANCED WIZARD DATA ─── */
+var wizardSteps = {
+  java: [
+    { title:"🖥️ Welcome — Java Edition", body:'<p>You\'re downloading <strong>Java Edition mods</strong>. These use <strong>.jar</strong> files and require a mod loader like <strong>Forge</strong>, <strong>Fabric</strong>, or <strong>NeoForge</strong>. Make sure you have the correct loader installed for your Minecraft version — they are <strong>not interchangeable</strong>.</p><div class="callout info"><span class="callout-icon">ℹ️</span><span>If in doubt, open your Minecraft launcher and check the profile name — it will say "Forge", "Fabric", etc. next to the version number.</span></div>', miaTip:'🌿 <strong>MIA Helps:</strong> All MIA‑shared CurseForge links lead directly to the mod page, so you can skip searching.' },
+    { title:"🌐 Step 1: Go to CurseForge", body:'<p>Open your browser and go to <strong>curseforge.com/minecraft</strong>. CurseForge is the largest Minecraft mod repository — clean, official, and owned by Overwolf. You can also use the <strong>CurseForge app</strong> (standalone launcher) which handles mod installation automatically.</p><div class="callout tip"><span class="callout-icon">💡</span><span>The CurseForge app is the easiest way for beginners — it installs mods with one click and manages your profiles and loaders.</span></div>', miaTip:'🌿 <strong>MIA Helps:</strong> CurseForge is safe with no fake download buttons. The real download is always on the file list.' },
+    { title:"🔍 Step 2: Search for Your Mod", body:'<p>Use the search bar at the top. Type the mod name (e.g. <strong>"Sodium"</strong> or <strong>"JEI"</strong>), then click the correct result from the list. You can also use the sidebar filters to narrow by <strong>mod loader</strong> (Forge / Fabric) and <strong>game version</strong> before searching.</p><div class="callout tip"><span class="callout-icon">💡</span><span>Look for mods with the "Verified" badge — these are from trusted, official authors.</span></div>', miaTip:'🌿 <strong>MIA Helps:</strong> We often share direct links to the mod\'s CurseForge page, saving you the search step entirely.' },
+    { title:"⚠️ Step 3: Check Compatibility", body:'<p>On the mod page, <strong>before downloading</strong>, check three things:</p><ul style="margin-top:8px;padding-left:20px;"><li><strong>Minecraft Version</strong> — must match your game (e.g. 1.20.1).</li><li><strong>Mod Loader</strong> — Forge, Fabric, or NeoForge. These are <strong>NOT interchangeable!</strong></li><li><strong>Dependencies</strong> — some mods need other mods (like Fabric API or GeckoLib). Check the "Relations" tab.</li></ul><div class="callout warn"><span class="callout-icon">⚠️</span><span>Using a Fabric mod with Forge (or vice versa) is the #1 reason mods fail to load. Always double‑check!</span></div>', miaTip:'🌿 <strong>MIA Helps:</strong> The "Relations" tab on CurseForge lists required dependencies — never skip this check.' },
+    { title:"📦 Step 4: Go to the Files Tab", body:'<p>Click the <strong>"Files"</strong> tab just below the project title. You\'ll see a list of all available versions with the newest at the top. Use the <strong>dropdown menus</strong> at the top of the Files tab to filter by game version and mod loader.</p><p style="margin-top:8px;">Each file shows the Minecraft version and mod loader it supports. Pick the version that matches your setup.</p>', miaTip:'🌿 <strong>MIA Helps:</strong> CurseForge usually marks the latest file for each version — but always verify manually.' },
+    { title:"📥 Step 5: Download the File", body:'<p>Click the three dots <strong>(⋯)</strong> next to the version you want, then press <strong>"Download File"</strong>. A <strong>5‑second countdown</strong> may appear — this is normal and built into CurseForge. Wait for it, then the download starts automatically.</p><p style="margin-top:8px;">The file saves as a <strong>.jar</strong> (e.g. <code>sodium-fabric-1.20.1.jar</code>).</p><div class="callout warn"><span class="callout-icon">⚠️</span><span>Never click banner ads around the page — they are not the real download. The genuine download button is inside the Files tab.</span></div>', miaTip:'🌿 <strong>MIA Helps:</strong> CurseForge doesn\'t use Linkvertise or ad‑walls. The 5‑second wait is part of the site.' },
+    { title:"📁 Step 6: Locate & Install the Mod", body:'<p>Find the downloaded <strong>.jar</strong> in your Downloads folder. <strong>Do NOT double‑click it</strong> — just move it to your mods folder:</p><ul style="margin-top:8px;padding-left:20px;"><li>Press <code>Win + R</code>, type <code>%appdata%</code>, then open <strong>.minecraft</strong>.</li><li>Open or create the <strong>mods</strong> folder.</li><li>Drag the .jar into the mods folder.</li></ul><p style="margin-top:8px;"><strong>macOS:</strong> <code>~/Library/Application Support/minecraft</code> · <strong>Linux:</strong> <code>~/.minecraft</code></p>', miaTip:'🌿 <strong>MIA Helps:</strong> If the mods folder doesn\'t exist, just create it. That\'s completely normal for first‑time modders.' },
+    { title:"▶️ Step 7: Launch & Confirm", body:'<p>Open the Minecraft Launcher, select your <strong>Forge</strong>, <strong>Fabric</strong>, or <strong>NeoForge</strong> profile, and press Play.</p><p style="margin-top:8px;">If everything works, the mod will load. Check by clicking the <strong>Mods</strong> button on the main menu. If it crashes or doesn\'t appear, double‑check the version, loader, and any missing dependencies.</p><div class="callout warn"><span class="callout-icon">⚠️</span><span>Missing dependencies are a common cause of crashes. Always check the "Relations" tab on the CurseForge page.</span></div>', miaTip:'🌿 <strong>MIA Helps:</strong> Join our Discord if you need help troubleshooting — our community is here to assist.' }
+  ],
+  bedrock: [
+    { title:"📱 Welcome — Bedrock Edition", body:'<p>You\'re downloading <strong>Bedrock Edition content</strong> (add‑ons, resource packs, worlds). These use <strong>.mcpack</strong> or <strong>.mcaddon</strong> files that auto‑import into Minecraft. <strong>Do NOT download .jar files</strong> — those are for Java only.</p><div class="callout info"><span class="callout-icon">ℹ️</span><span>CurseForge has a dedicated Bedrock section at <strong>curseforge.com/minecraft-bedrock</strong> with thousands of add‑ons, worlds, and texture packs.</span></div>', miaTip:'🌿 <strong>MIA Helps:</strong> CurseForge has a large Bedrock section. Always look for the Bedrock badge on the mod page.' },
+    { title:"🌐 Step 1: Go to CurseForge (Bedrock)", body:'<p>Open your browser and go to <strong>curseforge.com/minecraft-bedrock</strong>. You can also browse the main CurseForge site and switch to Bedrock using the <strong>edition toggle</strong> at the top of the page.</p><p style="margin-top:8px;">Browse categories like <strong>Add‑ons</strong>, <strong>Texture Packs</strong>, or <strong>Worlds</strong> to find content.</p>', miaTip:'🌿 <strong>MIA Helps:</strong> The Bedrock section clearly labels all content as "Minecraft Bedrock" — you won\'t accidentally grab Java files.' },
+    { title:"⚠️ Step 2: Check File Type (CRITICAL)", body:'<p>Before downloading, <strong>always check the file extension</strong>. Bedrock only works with:</p><ul style="margin-top:8px;padding-left:20px;"><li><strong>.mcpack</strong> — single resource or behaviour pack</li><li><strong>.mcaddon</strong> — contains both resource + behaviour pack</li><li><strong>.mcworld</strong> — world / map file</li></ul><div class="callout warn"><span class="callout-icon">⚠️</span><span>If you see a <strong>.jar</strong> file, it\'s for Java — do NOT download it. It will not work on Bedrock.</span></div>', miaTip:'🌿 <strong>MIA Helps:</strong> On mobile, always look for .mcpack or .mcaddon. That\'s your confirmation it\'s Bedrock content.' },
+    { title:"📦 Step 3: Go to the Files Tab", body:'<p>On the project page, click the <strong>"Files"</strong> tab. You\'ll see a list of available versions. Most Bedrock add‑ons have just one or two files — pick the latest version.</p>', miaTip:'🌿 <strong>MIA Helps:</strong> CurseForge typically lists the newest compatible version first — but always verify the filename before downloading.' },
+    { title:"📥 Step 4: Download the File", body:'<p>Click the <strong>orange Download button</strong>. A 5‑second countdown may appear — this is normal and built into CurseForge. After the countdown, the file saves to your Downloads folder.</p><div class="callout tip"><span class="callout-icon">💡</span><span>CurseForge doesn\'t have fake download buttons on the Bedrock section. The orange button is the real one — no ads to confuse you.</span></div>', miaTip:'🌿 <strong>MIA Helps:</strong> The orange download button is always the genuine one on CurseForge Bedrock pages.' },
+    { title:"📁 Step 5: Open & Import the File", body:'<p>Open your file manager (like <strong>ZArchiver</strong> on Android or the Files app on iOS). Locate the <strong>.mcpack</strong> or <strong>.mcaddon</strong> file.</p><p style="margin-top:8px;">Tap the file and choose <strong>Minecraft</strong>. Minecraft will open and display:</p><p style="color:var(--tip);font-weight:700;margin-top:6px;">"Import Started…" → "Successfully Imported"</p><div class="callout tip"><span class="callout-icon">💡</span><span>If the file doesn\'t open, try "Open with" → Minecraft. If it\'s a .zip, rename it to .mcpack first.</span></div>', miaTip:'🌿 <strong>MIA Helps:</strong> The import process is automatic — just tap and Minecraft handles the rest.' },
+    { title:"⚙️ Step 6: Activate in Your World", body:'<p>After importing, the pack still needs to be <strong>activated</strong>:</p><ul style="margin-top:8px;padding-left:20px;"><li>Create or edit a world</li><li>Scroll to <strong>Behaviour Packs</strong> and/or <strong>Resource Packs</strong></li><li>Tap the pack → <strong>Active</strong></li><li>For .mcaddon files, enable <strong>both</strong> packs</li></ul><div class="callout info"><span class="callout-icon">ℹ️</span><span>Some add‑ons require <strong>Experimental Gameplay</strong>. Go to World Settings → Experiments and enable what the add‑on documentation mentions (e.g. Holiday Creator Features).</span></div>', miaTip:'🌿 <strong>MIA Helps:</strong> For .mcaddon files, both packs appear separately — activate both or it won\'t work.' },
+    { title:"✅ Step 7: Play!", body:'<p>Enter your world and the content should be active. If something isn\'t working:</p><ul style="margin-top:8px;padding-left:20px;"><li>Check the pack is enabled in world settings</li><li>Verify your Minecraft version is up to date</li><li>Enable any required experimental features</li><li>If the import failed, re‑download and try again</li></ul>', miaTip:'🌿 <strong>MIA Helps:</strong> Need a full import guide with detailed troubleshooting? Use the yellow button below.' }
+  ]
+};
+
+var stepColors = ['#00c6ff','#a78bfa','#f59e0b','#34d399','#f87171','#60a5fa','#f472b6','#00ff88'];
+var currentEdition = null;
+var currentStep = 0;
+
+var choiceScreen = document.getElementById('choiceScreen');
+var wizardArea = document.getElementById('wizardArea');
+var stepContainer = document.getElementById('stepContainer');
+var prevBtn = document.getElementById('prevBtn');
+var nextBtn = document.getElementById('nextBtn');
+var indicatorEl = document.getElementById('stepIndicator');
+var progressFill = document.getElementById('progressFill');
+var extraBtn = document.getElementById('stepExtraBtn');
+var backBtn = document.getElementById('backBtn');
+
+/* ─── EDITION BUTTON CLICK HANDLERS ─── */
+document.getElementById('btnJava').onclick = function(){ startWizard('java'); };
+document.getElementById('btnBedrock').onclick = function(){ startWizard('bedrock'); };
+backBtn.onclick = function(){ goBackToChoice(); };
+prevBtn.onclick = function(){ changeStep(-1); };
+nextBtn.onclick = function(){ changeStep(1); };
+
+function startWizard(edition) {
+  if (!edition) return;
+  currentEdition = edition;
+  currentStep = 0;
+  choiceScreen.classList.add('hidden');
+  wizardArea.style.display = 'block';
+  renderSteps();
+  updateUI();
+  stepContainer.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+function goBackToChoice() {
+  wizardArea.style.display = 'none';
+  choiceScreen.classList.remove('hidden');
+  currentEdition = null;
+}
+
+function renderSteps() {
+  var steps = wizardSteps[currentEdition];
+  stepContainer.innerHTML = '';
+  steps.forEach(function(step, idx) {
+    var panel = document.createElement('div');
+    panel.className = 'step-panel';
+    var color = stepColors[idx % stepColors.length];
+    panel.style.borderLeftColor = color;
+    panel.innerHTML =
+      '<div class="step-title">' +
+        '<span class="step-num" style="background:'+color+';box-shadow:0 0 14px '+color+';">STEP '+(idx+1)+'</span>' +
+        step.title +
+      '</div>' +
+      '<div class="step-body">'+step.body+'</div>' +
+      '<div class="callout mia-callout">' +
+        '<span class="callout-icon"><img src="mia-icon.png" alt="MIA" style="width:18px;height:18px;border-radius:3px;"></span>' +
+        '<span>'+step.miaTip+'</span>' +
+      '</div>';
+    stepContainer.appendChild(panel);
+  });
+}
+
+function updateUI() {
+  var steps = wizardSteps[currentEdition];
+  var panels = stepContainer.querySelectorAll('.step-panel');
+  panels.forEach(function(p, i) { p.classList.toggle('active', i === currentStep); });
+  prevBtn.disabled = (currentStep === 0);
+  nextBtn.disabled = (currentStep === steps.length - 1);
+  indicatorEl.textContent = (currentStep+1)+' / '+steps.length;
+  progressFill.style.width = ((currentStep/(steps.length-1))*100)+'%';
+  extraBtn.style.display = (currentStep === steps.length - 1) ? 'block' : 'none';
+  nextBtn.textContent = (currentStep === steps.length - 1) ? '✅ Done' : 'Next →';
+}
+
+function changeStep(dir) {
+  var steps = wizardSteps[currentEdition];
+  var next = currentStep + dir;
+  if (next >= 0 && next < steps.length) {
+    currentStep = next;
+    updateUI();
+    stepContainer.scrollIntoView({ behavior:'smooth', block:'start' });
+  }
+}
+</script>
+</body>
+</html>
